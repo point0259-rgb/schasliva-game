@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кухонний Менеджер - Щаслива Господиня</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .game-container { background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 800px; width: 100%; padding: 30px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .logo { font-size: 32px; font-weight: bold; color: #667eea; margin-bottom: 10px; }
+        .subtitle { color: #666; font-size: 16px; }
+        .game-stats { display: flex; justify-content: space-around; margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; }
+        .stat { text-align: center; }
+        .stat-label { font-size: 14px; color: #666; margin-bottom: 5px; }
+        .stat-value { font-size: 28px; font-weight: bold; color: #667eea; }
+        .customer-area { background: #fff3cd; border: 3px solid #ffc107; border-radius: 15px; padding: 20px; margin-bottom: 20px; min-height: 150px; }
+        .customer { display: flex; align-items: center; gap: 15px; }
+        .customer-icon { font-size: 60px; }
+        .customer-order { flex: 1; }
+        .customer-name { font-weight: bold; font-size: 18px; margin-bottom: 10px; }
+        .order-items { display: flex; gap: 10px; flex-wrap: wrap; }
+        .order-item { background: white; padding: 8px 15px; border-radius: 20px; border: 2px solid #667eea; font-size: 14px; font-weight: 600; }
+        .timer-bar { height: 8px; background: #e9ecef; border-radius: 10px; margin-top: 15px; overflow: hidden; }
+        .timer-fill { height: 100%; background: linear-gradient(90deg, #28a745, #ffc107, #dc3545); transition: width 0.1s linear; }
+        .products-area { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .product-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 20px; border-radius: 15px; font-size: 16px; font-weight: bold; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .product-btn:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4); }
+        .product-icon { font-size: 32px; }
+        .selected-items { background: #e7f3ff; border: 2px solid #667eea; border-radius: 15px; padding: 15px; margin-bottom: 20px; min-height: 60px; }
+        .selected-label { font-weight: bold; color: #667eea; margin-bottom: 10px; }
+        .selected-list { display: flex; gap: 10px; flex-wrap: wrap; }
+        .selected-item { background: white; padding: 8px 15px; border-radius: 20px; font-size: 14px; display: flex; align-items: center; gap: 5px; }
+        .remove-btn { background: #dc3545; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 12px; }
+        .action-buttons { display: flex; gap: 15px; }
+        .submit-btn, .clear-btn, .start-btn { flex: 1; padding: 15px; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.3s; }
+        .submit-btn { background: #28a745; color: white; }
+        .clear-btn { background: #6c757d; color: white; }
+        .start-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; font-size: 22px; }
+        .game-over { text-align: center; padding: 40px; }
+        .game-over h2 { font-size: 36px; color: #667eea; margin-bottom: 20px; }
+        .final-score { font-size: 48px; font-weight: bold; color: #28a745; margin: 20px 0; }
+        .message { font-size: 18px; color: #666; margin: 20px 0; }
+        .cta { background: #ffc107; padding: 20px 40px; border-radius: 10px; margin-top: 30px; font-size: 18px; font-weight: bold; }
+        .hidden { display: none; }
+        .feedback { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px 50px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); font-size: 32px; font-weight: bold; z-index: 1000; }
+        .feedback.correct { color: #28a745; }
+        .feedback.wrong { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <div class="logo">🏪 Щаслива Господиня</div>
+            <div class="subtitle">Кухонний Менеджер</div>
+        </div>
+        <div id="startScreen">
+            <div style="text-align: center; padding: 40px 0;">
+                <h2 style="font-size: 24px; margin-bottom: 20px; color: #333;">Вітаємо в грі "Кухонний Менеджер"!</h2>
+                <p style="font-size: 16px; color: #666; margin-bottom: 30px;">Допомагайте клієнтам швидко знаходити потрібні продукти!</p>
+                <button class="start-btn" onclick="startGame()">🎮 Почати гру</button>
+            </div>
+        </div>
+        <div id="gameScreen" class="hidden">
+            <div class="game-stats">
+                <div class="stat"><div class="stat-label">Рахунок</div><div class="stat-value" id="score">0</div></div>
+                <div class="stat"><div class="stat-label">Рівень</div><div class="stat-value" id="level">1</div></div>
+                <div class="stat"><div class="stat-label">Замовлення</div><div class="stat-value" id="orders">0</div></div>
+            </div>
+            <div class="customer-area">
+                <div class="customer">
+                    <div class="customer-icon" id="customerIcon">👤</div>
+                    <div class="customer-order">
+                        <div class="customer-name" id="customerName">Очікування...</div>
+                        <div class="order-items" id="orderItems"></div>
+                    </div>
+                </div>
+                <div class="timer-bar"><div class="timer-fill" id="timerFill"></div></div>
+            </div>
+            <div class="selected-items">
+                <div class="selected-label">Вибрані продукти:</div>
+                <div class="selected-list" id="selectedList"></div>
+            </div>
+            <div class="products-area" id="productsArea"></div>
+            <div class="action-buttons">
+                <button class="clear-btn" onclick="clearSelection()">🗑️ Очистити</button>
+                <button class="submit-btn" onclick="submitOrder()">✅ Видати</button>
+            </div>
+        </div>
+        <div id="gameOverScreen" class="hidden">
+            <div class="game-over">
+                <h2>🎉 Гра завершена!</h2>
+                <div class="final-score" id="finalScore">0</div>
+                <div class="message" id="gameOverMessage"></div>
+                <div class="cta">📦 Замовте продукти на сайті "Щасливої Господині"!</div>
+                <button class="start-btn" onclick="resetGame()">🔄 Грати знову</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const products = [{name:'Соус томатний',icon:'🍅'},{name:'Соус часниковий',icon:'🧄'},{name:'Олія соняшникова',icon:'🌻'},{name:'Олія оливкова',icon:'🫒'},{name:'Спеції',icon:'🌶️'},{name:'Горіхи',icon:'🥜'},{name:'Сухофрукти',icon:'🍇'},{name:'Мед',icon:'🍯'},{name:'Макарони',icon:'🍝'},{name:'Крупи',icon:'🌾'},{name:'Консерви',icon:'🥫'},{name:"М'ясо",icon:'🥩'}];
+        const customerNames = ['Олена','Марія','Андрій','Петро','Наталія','Іван','Катерина','Дмитро'];
+        const customerIcons = ['👨','👩','🧑','👴','👵','🧔','👨‍🦰','👩‍🦰'];
+        let gameState = {score:0,level:1,ordersCompleted:0,currentOrder:[],selectedItems:[],timeLeft:100,timerInterval:null,maxOrderSize:3};
+        function startGame(){document.getElementById('startScreen').classList.add('hidden');document.getElementById('gameScreen').classList.remove('hidden');renderProducts();generateNewOrder();}
+      function renderProducts(){const c=document.getElementById('productsArea');c.innerHTML='';products.forEach(p=>{const b=document.createElement('button');b.className='product-btn';b.innerHTML=`<div class="product-icon">${p.icon}</div><div>${p.name}</div>`;b.onclick=()=>selectProduct(p);c.appendChild(b);});}
+        function generateNewOrder(){clearInterval(gameState.timerInterval);const s=Math.min(2+Math.floor(gameState.level/3),gameState.maxOrderSize);const sh=[...products].sort(()=>Math.random()-0.5);gameState.currentOrder=sh.slice(0,s);gameState.selectedItems=[];gameState.timeLeft=100;const n=customerNames[Math.floor(Math.random()*customerNames.length)];const i=customerIcons[Math.floor(Math.random()*customerIcons.length)];document.getElementById('customerName').textContent=n+' замовляє:';document.getElementById('customerIcon').textContent=i;const o=document.getElementById('orderItems');o.innerHTML='';gameState.currentOrder.forEach(it=>{const d=document.createElement('div');d.className='order-item';d.textContent=`${it.icon} ${it.name}`;o.appendChild(d);});updateSelectedList();startTimer();}
+        function startTimer(){gameState.timerInterval=setInterval(()=>{gameState.timeLeft-=0.5;document.getElementById('timerFill').style.width=gameState.timeLeft+'%';if(gameState.timeLeft<=0){clearInterval(gameState.timerInterval);wrongOrder('⏰ Час вийшов!');}},50);}
+        function selectProduct(p){if(gameState.selectedItems.length<gameState.currentOrder.length){gameState.selectedItems.push(p);updateSelectedList();}}
+        function updateSelectedList(){const c=document.getElementById('selectedList');c.innerHTML='';gameState.selectedItems.forEach((it,idx)=>{const d=document.createElement('div');d.className='selected-item';d.innerHTML=`${it.icon} ${it.name}<button class="remove-btn" onclick="removeItem(${idx})">×</button>`;c.appendChild(d);});}
+        function removeItem(i){gameState.selectedItems.splice(i,1);updateSelectedList();}
+        function clearSelection(){gameState.selectedItems=[];updateSelectedList();}
+        function submitOrder(){if(gameState.selectedItems.length===0)return;const c=gameState.currentOrder.length===gameState.selectedItems.length&&gameState.currentOrder.every(it=>gameState.selectedItems.some(s=>s.name===it.name));c?correctOrder():wrongOrder('❌ Неправильно!');}
+        function correctOrder(){clearInterval(gameState.timerInterval);const tb=Math.floor(gameState.timeLeft);const pts=100+tb+(gameState.level*10);gameState.score+=pts;gameState.ordersCompleted++;if(gameState.ordersCompleted%5===0){gameState.level++;gameState.maxOrderSize=Math.min(5,3+Math.floor(gameState.level/4));}updateStats();showFeedback('✅ +'+pts,true);setTimeout(()=>{gameState.ordersCompleted>=20?endGame():generateNewOrder();},1000);}
+        function wrongOrder(m){clearInterval(gameState.timerInterval);gameState.score=Math.max(0,gameState.score-50);updateStats();showFeedback(m,false);setTimeout(()=>{gameState.score===0&&gameState.ordersCompleted<3?endGame():generateNewOrder();},1500);}
+        function showFeedback(t,c){const f=document.createElement('div');f.className='feedback '+(c?'correct':'wrong');f.textContent=t;document.body.appendChild(f);setTimeout(()=>f.remove(),1000);}
+        function updateStats(){document.getElementById('score').textContent=gameState.score;document.getElementById('level').textContent=gameState.level;document.getElementById('orders').textContent=gameState.ordersCompleted;}
+        function endGame(){document.getElementById('gameScreen').classList.add('hidden');document.getElementById('gameOverScreen').classList.remove('hidden');document.getElementById('finalScore').textContent=gameState.score+' балів';let m='';if(gameState.score>=2000)m='🌟 Чудово!';else if(gameState.score>=1000)m='👏 Відмінно!';else if(gameState.score>=500)m='👍 Непогано!';else m='💪 Спробуйте ще!';m+=`<br><br>Виконано ${gameState.ordersCompleted} замовлень, рівень ${gameState.level}`;document.getElementById('gameOverMessage').innerHTML=m;}
+      
+      
+      
+      
